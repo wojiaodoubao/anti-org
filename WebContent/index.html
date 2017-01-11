@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Insert title here</title>
+  <!-- 引入 Bootstrap -->
+  <link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">    
+</head>
+<script>
+function createRoom(){
+	window.location.href='NewGameServlet'
+}
+function joinRoom(){
+	var x = document.getElementById("roomId");
+	window.location.href='JoinGameServlet?roomId='+x.value;
+}
+</script>
+<body>
+  <button class="btn btn-lg btn-success" onclick="createRoom()">创建</button>
+  <input id="roomId" type="text">
+  <button class="btn btn-lg btn-primary" onclick="joinRoom()">加入</button>
+</body>
+</html>
