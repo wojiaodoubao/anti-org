@@ -32,13 +32,23 @@ public class VoteServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		HttpSession session = request.getSession();
 		int roomId = (int)session.getAttribute(StaticInfo.ROOM_ID);
+		int playerId = (int)session.getAttribute(StaticInfo.PLAYER_ID);
 		String type = request.getParameter("type"); 
 		if(type==null){
 			int voteNum = StaticInfo.fetchVoteNum(roomId);
 			int playerNum = StaticInfo.getPlayerNumByRoomId(roomId);
 			String result = StaticInfo.fetchResult(roomId);
-			response.getWriter().println(voteNum+"#"+playerNum+"#"+result);
-			response.flushBuffer();				
+			String identity = StaticInfo.getIdentityByPlayerId(roomId, playerId);
+			int[] colors = StaticInfo.getColor(roomId);
+			String s = voteNum+"#"+playerNum+"#"+result+"#"+identity+"#";
+			if(colors!=null){
+				for(int i=0;i<colors.length;i++)
+					s+=colors[i]+":";
+				s=s.substring(0,s.length()-1);
+			}
+			response.setContentType("text/html;charset=UTF-8");
+			response.getWriter().println(s);
+			response.flushBuffer();	
 		}
 		else if(type.equals("start")){
 			StaticInfo.startVote(roomId);
@@ -56,6 +66,13 @@ public class VoteServlet extends HttpServlet {
 				}
 			}
 			StaticInfo.setResult(roomId, s);			
+		}
+		else if(type.equals("task")){
+			int id = Integer.parseInt(request.getParameter("id"));	
+			StaticInfo.changeColor(roomId, id);
+		}
+		else if(type.equals("shuffleIdentity")){
+			StaticInfo.shuffleIdentities(roomId);
 		}
 		else;
 	}

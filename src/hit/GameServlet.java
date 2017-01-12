@@ -34,8 +34,12 @@ public class GameServlet extends HttpServlet {
 			;
 		}
 		else if(s.equals("new")){
+			String iden = request.getParameter("identity");
 			int roomId = StaticInfo.createRoom();
 			session.setAttribute(StaticInfo.ROOM_ID, roomId);
+			if(iden!=null){
+				StaticInfo.setIdentities(roomId, iden.split(" "));
+			}
 			int playerId = StaticInfo.createPlayerByRoomId(roomId);
 			session.setAttribute(StaticInfo.PLAYER_ID, playerId);
 			response.sendRedirect("vote.jsp");			

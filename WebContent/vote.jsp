@@ -6,7 +6,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>抵抗组织</title>
 	<!-- 引入 Bootstrap -->
-	<link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">    
+	<link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+	<script language="JavaScript" src="vote.js">
+	</script>	    
 </head>
 <script>
 function startVote(){
@@ -28,6 +30,25 @@ function endVote(){
 	var xmlhttp=new XMLHttpRequest();
 	xmlhttp.open("GET",'VoteServlet?type=end',true);
 	xmlhttp.send(); 	
+}
+function changeTask(id){
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET",'VoteServlet?type=task&id='+id,true);
+	xmlhttp.send(); 	
+}
+function colorClass(id){	
+	if(id==1)return 'red';
+	else if(id==2)return 'blue';
+	else return 'grey';
+}
+function showIdentity(){
+	document.getElementById("infobar").innerHTML = '您的身份是:<b>'+iden+'</b>';
+	setTimeout(function(){document.getElementById("infobar").innerHTML = '抵抗组织';},1000);	
+}
+function shuffleIdentity(){
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET",'VoteServlet?type=shuffleIdentity',true);
+	xmlhttp.send(); 
 }
 function fetchVoteNum(){
 	var xmlhttp=new XMLHttpRequest();
@@ -52,6 +73,11 @@ function fetchVoteNum(){
 				document.getElementById("against").disabled=true;	
 				document.getElementById("result").innerHTML="投票结果:"+s[2];	
 			}
+			iden = s[3];//身份
+			var colors = s[4].split(":");//颜色
+			for(i=0;i<colors.length;i++){
+				document.getElementById("task"+i).style="background-color:"+colorClass(colors[i]);
+			}
 		}
 	}	
 	xmlhttp.open("GET","VoteServlet",true);
@@ -59,42 +85,78 @@ function fetchVoteNum(){
 	setTimeout("fetchVoteNum()",200);
 }
 fetchVoteNum();
-
+var iden='未知';//身份
 </script>
 <style type="text/css">
-#main {
-	max-width:600px;
-	margin:0 auto;
-	position:relative
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  width:100%;
 }
-.simple {
-  width: 500px;
-  margin: 20px auto;
-  -webkit-box-sizing: border-box;
-     -moz-box-sizing: border-box;
-          box-sizing: border-box;
+#container{
+  min-height:100%;
+  height:auto!important;
+  height:100%;
+  position:relative;
 }
-.left-bottom-fixed{
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width:170px;
+#infobar{
+  width:100%;
+  height:10%;
+  margin:0px;
+  text-align:center; 
+  font-weight:bold;
+  font-size:17px;
 }
-.left-fixed{
-  position: fixed;
-  left: 0;
-  width:200px;
+#page{
+  width:100%;
+  height:40%;
+  margin:0 auto;
 }
-.right-fixed{
-  position: fixed;
-  right: 0;
-  width:150px;
+#roominfo{
+  width:50%;
+  height:100%;
+  float:left;  
+  font-size:17px;  
 }
-.right-bottom-fixed{
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  width:170px;
+.group{
+  width:100%;
+  height:100%;
+}
+.item{
+  width:100%;
+  height:20%;
+  float:left; 
+}
+#buttonsection{
+  width:50%;
+  height:100%;  
+  float:left;   
+}
+.button{
+  width:50%;
+  height:20%;
+  float:left;
+}
+#tasksection{
+  width:100%;
+  height:40%;
+  margin:0 auto;
+}
+.task{
+  width:20%;
+  height:50px;
+  float:left;
+  background-color:grey;  
+}
+#footer{
+  width: 100%;
+  height: 20%;
+}
+.votebutton{
+  width:50%;
+  height:100%;
+  float:left;  
 }
 </style>
 <%
@@ -103,33 +165,43 @@ int playerId = (int)session.getAttribute(StaticInfo.PLAYER_ID);
 int playerNum = StaticInfo.getPlayerNumByRoomId(roomId);
 %>
 <body>
-<div id='main' class="simple">
-  <div class="alert alert-success" role="alert" id="infobar">抵抗组织</div>
- 
-  <div class="col-sm-4 left-fixed">
-    <ul class="list-group">
-      <li class="list-group-item">房间:<%=roomId%></li>
-      <li class="list-group-item">玩家编号:<%=playerId%></li>
-      <li class="list-group-item" id="playerNum">玩家人数:<%=playerNum%></li>
-      <li class="list-group-item" id="voteNum">投票数:</li>
-      <li class="list-group-item" id="result" >投票结果:
-      <%if(request.getParameter("voteResult")!=null) {%><%=request.getParameter("voteResult")%><%} %>
-      </li>
-    </ul>
-  </div><!-- /.col-sm-4 -->  
-  
+<div id='container'>
+  <div class="alert alert-success" role="alert" id="infobar">抵抗组织
+  </div><!-- 信息栏 -->
 
-  <div class="right-fixed">	
-    <button class="btn btn-lg btn-success" id="startVote" onclick="startVote()"><%if(StaticInfo.isOnVote(roomId)){ %>重新发起投票<%}else{ %>发起投票<% }%></button>
-    <button class="btn btn-lg btn-danger" id="endVote" onclick="endVote()" <%if(!StaticInfo.isOnVote(roomId)){ %>disabled="true"<%} %>>结束投票</button>  
-    <button class="btn btn-lg btn-warning" id="back" onclick="backToIndex()">返回</button>
-  </div>
-  <div>
-    <button class="btn btn-lg btn-success left-bottom-fixed" id="agree" onclick="vote(0)" <%if(!StaticInfo.isOnVote(roomId)){ %>disabled="true"<%} %>>同意</button>
-    <button class="btn btn-lg btn-danger right-bottom-fixed" id="against" onclick="vote(1)" <%if(!StaticInfo.isOnVote(roomId)){ %>disabled="true"<%} %>>反对</button>  
-  </div>
-  <div>  
-  </div>
+  <div id="page">
+    <div class="col-sm-4" id="roominfo">
+      <ul class="list-group group">
+        <li class="list-group-item item">房间:<%=roomId%></li>
+        <li class="list-group-item item">玩家编号:<%=playerId%></li>
+        <li class="list-group-item item" id="playerNum">玩家人数:<%=playerNum%></li>
+        <li class="list-group-item item" id="voteNum">投票数:</li>
+        <li class="list-group-item item" id="result" >投票结果:
+        <%if(request.getParameter("voteResult")!=null) {%><%=request.getParameter("voteResult")%><%} %>
+        </li>
+      </ul>
+    </div><!-- 房间信息 -->  
+    <div class="buttonsection">	
+      <button class="btn btn-lg btn-success button" id="startVote" onclick="startVote()"><%if(StaticInfo.isOnVote(roomId)){ %>重新发起投票<%}else{ %>发起投票<% }%></button>
+      <button class="btn btn-lg btn-danger button" id="endVote" onclick="endVote()" <%if(!StaticInfo.isOnVote(roomId)){ %>disabled="disabled"<%} %>>结束投票</button>  
+      <button class="btn btn-lg btn-warning button" onclick="shuffleIdentity()" >混洗身份</button>  	
+      <button class="btn btn-lg btn-danger button" onclick="showIdentity()" >查看身份</button>    
+      <button class="btn btn-lg btn-warning button" id="back" onclick="backToIndex()">返回</button>
+    </div><!-- 投票发起与结束 -->
+  </div>  
+  
+  <div id="tasksection">
+    <div class="taskBlock task" id="task0" onclick="changeTask(0)" style="background-color:grey"></div>
+    <div class="taskBlock task" id="task1" onclick="changeTask(1)" style="background-color:grey"></div>
+    <div class="taskBlock task" id="task2" onclick="changeTask(2)" style="background-color:grey"></div>
+    <div class="taskBlock task" id="task3" onclick="changeTask(3)" style="background-color:grey"></div>
+    <div class="taskBlock task" id="task4" onclick="changeTask(4)" style="background-color:grey"></div>  
+  </div><!-- 任务结果 -->
+  
+  <div id="footer">
+    <button class="btn btn-lg btn-success votebutton" id="agree" onclick="vote(0)" <%if(!StaticInfo.isOnVote(roomId)){ %>disabled="disabled"<%} %>>同意</button>
+    <button class="btn btn-lg btn-danger votebutton" id="against" onclick="vote(1)" <%if(!StaticInfo.isOnVote(roomId)){ %>disabled="disabled"<%} %>>反对</button>  
+  </div><!-- 投票按钮 -->
 </div>
 </body>
 </html>

@@ -8,20 +8,61 @@
 </head>
 <script>
 function createRoom(){
-	window.location.href='GameServlet?type=new'
+	var s = document.getElementById("identity").value;
+	window.location.href='GameServlet?type=new&identity='+s;
 }
 function joinRoom(){
 	var x = document.getElementById("roomId");
 	window.location.href='GameServlet?type=join&roomId='+x.value;
 }
+function defaultIdentity(num){
+	if(num==5){
+		document.getElementById("identity").value="刺客 卧底 指挥官 良民 良民";
+	}
+	else if(num==6){
+		document.getElementById("identity").value="刺客 卧底 指挥官 良民 良民 良民";
+	}
+	else if(num==7){
+		document.getElementById("identity").value="刺客 卧底 普通坏人 指挥官 良民 良民 良民";
+	}
+	else{
+		document.getElementById("identity").value="输入身份 空格分隔";
+	}
+}
 </script>
+<style>
+.section{
+  width:500px;
+  float:left;
+  padding:10px;
+  font-size:17px; 
+}
+.footer{
+  font-size:17px; 
+  float:left;
+}
+#identity{
+  width:350px;
+}
+#roomId{
+  width:350px;
+}
+</style>
 <body>
-  <button class="btn btn-lg btn-success" onclick="createRoom()">创建</button>
-  <input id="roomId" type="text">
+<div class="section"">
+  <button class="btn btn-lg btn-success" onclick="createRoom()">创建</button> 
+  <input type="text" id='identity' value='输入身份 空格分隔' />
+  <button class="btn btn-lg btn-info" onclick="defaultIdentity(5)">5人</button>
+  <button class="btn btn-lg btn-warning" onclick="defaultIdentity(6)">6人</button>
+  <button class="btn btn-lg btn-info" onclick="defaultIdentity(7)">7人</button> 
+</div><!-- 创建房间 -->
+<div class="section">
   <button class="btn btn-lg btn-primary" onclick="joinRoom()">加入</button>
-  <div class="well">
-    <p>抵抗组织的故事和规则都很单纯，玩家们作为反抗组织，需要完成5个任务中的3个以赢得游戏。但组织内部夹杂了间谍，他们会破坏任务的完成而取得胜利。反抗组织的成员们需要通过大家的各种投票结果和发言来找出间谍，以求顺利完成任务。<a href=http://tieba.baidu.com/p/1419030730 />规则介绍</a></p>
-  </div>  
+  <input id="roomId" type="text">
+</div><!-- 加入房间 -->  
+<div class="well footer">
+  <p>抵抗组织的故事和规则都很单纯，玩家们作为反抗组织，需要完成5个任务中的3个以赢得游戏。但组织内部夹杂了间谍，他们会破坏任务的完成而取得胜利。反抗组织的成员们需要通过大家的各种投票结果和发言来找出间谍，以求顺利完成任务。<a href=http://tieba.baidu.com/p/1419030730 />规则介绍</a></p>
+</div>  
   
 </body>
 </html>

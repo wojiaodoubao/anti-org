@@ -9,10 +9,14 @@ public class StaticInfo {
 	public static class RoomInfo{
 		int playerNum;
 		AnonymousVote vote;
+		int[] taskColor;//0-default 1-success 2-fail
+		String[] identities;
 		String result;
 		public RoomInfo(){
 			playerNum = 0;
 			vote = null;
+			taskColor = new int[5];
+			identities = null;
 		}
 	}
 	static{
@@ -76,6 +80,57 @@ public class StaticInfo {
 	public static void setResult(int roomId,String s){
 		if(!isRoomExist(roomId))return;
 		roomMap.get(roomId).result = s;		
+	}
+	/**
+	 * 改变task按钮颜色
+	 * */
+	synchronized public static void changeColor(int roomId,int id){
+		if(!isRoomExist(roomId))return;
+		roomMap.get(roomId).taskColor[id]+=1;
+		roomMap.get(roomId).taskColor[id]%=3;
+	}
+	/**
+	 * 返回task按钮颜色
+	 * */
+	public static int[] getColor(int roomId){
+		if(!isRoomExist(roomId))return null;
+		return roomMap.get(roomId).taskColor;
+	}
+	/**
+	 * 设置身份信息
+	 * */
+	synchronized public static void setIdentities(int roomId,String[] s){
+		if(!isRoomExist(roomId))return;
+		roomMap.get(roomId).identities = s;
+	}	
+	/**
+	 * 获取身份信息
+	 * 身份数组identities中，玩家身份与玩家编号(session)对应
+	 * */
+	public static String getIdentityByPlayerId(int roomId,int id){
+		if(!isRoomExist(roomId))return null;
+		String[] iden = roomMap.get(roomId).identities;
+		if(id>=iden.length||id<0)return null;
+		return iden[id];
+	}
+	/**
+	 * 混洗身份
+	 * 洗牌算法
+	 * */
+	synchronized public static void shuffleIdentities(int roomId){
+		if(!isRoomExist(roomId))return;
+		String[] iden = roomMap.get(roomId).identities;
+		String[] newI = new String[iden.length];
+		Random r = new Random();
+		for(int i=iden.length;i>0;i--){
+			int ran = Math.abs(r.nextInt())%i;
+			newI[iden.length-i] = iden[ran];
+			iden[ran] = iden[i-1];
+		}
+		roomMap.get(roomId).identities = newI;
+//		for(String s:newI)
+//			System.out.print(s+":");
+//		System.out.println();
 	}
 	private static Random random;
 	private static Map<Integer,RoomInfo> roomMap;//roomId-roomInfo
