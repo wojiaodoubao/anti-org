@@ -2,22 +2,26 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Insert title here</title>
+  <title>抵抗组织</title>
   <!-- 引入 Bootstrap -->
   <link href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">    
 </head>
 <script>
 function createRoom(){
-	window.location.href='NewGameServlet'
+	window.location.href='GameServlet?type=new'
 }
 function joinRoom(){
 	var x = document.getElementById("roomId");
-	window.location.href='JoinGameServlet?roomId='+x.value;
+	window.location.href='GameServlet?type=join&roomId='+x.value;
 }
 </script>
 <body>
   <button class="btn btn-lg btn-success" onclick="createRoom()">创建</button>
   <input id="roomId" type="text">
   <button class="btn btn-lg btn-primary" onclick="joinRoom()">加入</button>
+  <div class="well">
+    <p>抵抗组织的故事和规则都很单纯，玩家们作为反抗组织，需要完成5个任务中的3个以赢得游戏。但组织内部夹杂了间谍，他们会破坏任务的完成而取得胜利。反抗组织的成员们需要通过大家的各种投票结果和发言来找出间谍，以求顺利完成任务。<a href=http://tieba.baidu.com/p/1419030730 />规则介绍</a></p>
+  </div>  
+  
 </body>
 </html>

@@ -10,16 +10,24 @@
 </head>
 <script>
 function startVote(){
-	window.location.href='StartVoteServlet'
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET","VoteServlet?type=start",true);
+	xmlhttp.send();  	
 }
 function vote(index){
-	window.location.href='VoteServlet?voteIndex='+index
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET",'VoteServlet?type=vote&voteIndex='+index,true);
+	xmlhttp.send(); 			
+	document.getElementById("infobar").innerHTML = '您投了一票';
+	setTimeout(function(){document.getElementById("infobar").innerHTML = '抵抗组织';},1000);
 }
 function backToIndex(){
 	window.location.href='index.html'
 }
 function endVote(){
-	window.location.href='EndVoteServlet'
+	var xmlhttp=new XMLHttpRequest();
+	xmlhttp.open("GET",'VoteServlet?type=end',true);
+	xmlhttp.send(); 	
 }
 function fetchVoteNum(){
 	var xmlhttp=new XMLHttpRequest();
@@ -46,9 +54,9 @@ function fetchVoteNum(){
 			}
 		}
 	}	
-	xmlhttp.open("GET","VoteNumServlet",true);
+	xmlhttp.open("GET","VoteServlet",true);
 	xmlhttp.send();  
-	setTimeout("fetchVoteNum()",1000)
+	setTimeout("fetchVoteNum()",200);
 }
 fetchVoteNum();
 
@@ -96,7 +104,7 @@ int playerNum = StaticInfo.getPlayerNumByRoomId(roomId);
 %>
 <body>
 <div id='main' class="simple">
-
+  <div class="alert alert-success" role="alert" id="infobar">抵抗组织</div>
  
   <div class="col-sm-4 left-fixed">
     <ul class="list-group">
