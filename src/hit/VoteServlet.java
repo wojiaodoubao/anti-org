@@ -1,6 +1,8 @@
 package hit;
 
 import java.io.IOException;
+import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -46,6 +48,18 @@ public class VoteServlet extends HttpServlet {
 					s+=colors[i]+":";
 				s=s.substring(0,s.length()-1);
 			}
+			//
+			List<String> nightInfo = StaticInfo.getNightInfoByPlayerId(roomId, playerId);
+			StringBuffer sb = new StringBuffer();
+			for(int i=0;i<nightInfo.size();i++)
+				sb.append(nightInfo.get(i)+",");
+			if(sb!=null&&sb.length()>0&&sb.charAt(sb.length()-1)=='%')
+				sb.deleteCharAt(sb.length()-1);	
+			if(sb.length()>0)
+				s+="#"+sb.toString();
+			else
+				s+="#"+"you know nothing, John Snow !";
+			//			
 			response.setContentType("text/html;charset=UTF-8");
 			response.getWriter().println(s);
 			response.flushBuffer();	
@@ -74,6 +88,17 @@ public class VoteServlet extends HttpServlet {
 		else if(type.equals("shuffleIdentity")){
 			StaticInfo.shuffleIdentities(roomId);
 		}
+		else if(type.equals("nightInfo")){			
+			List<String> nightInfo = StaticInfo.getNightInfoByPlayerId(roomId, playerId);
+			StringBuffer s = new StringBuffer();
+			for(int i=0;i<nightInfo.size();i++)
+				s.append(nightInfo.get(i)+"#");
+			if(s!=null&&s.length()>0&&s.charAt(s.length()-1)=='#')
+				s.deleteCharAt(s.length()-1);
+			response.setContentType("text/html;charset=UTF-8");
+			response.getWriter().println(s.toString());
+			response.flushBuffer();	
+		}		
 		else;
 	}
 

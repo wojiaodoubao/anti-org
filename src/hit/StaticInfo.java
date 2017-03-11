@@ -1,5 +1,7 @@
 package hit;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -132,6 +134,22 @@ public class StaticInfo {
 //			System.out.print(s+":");
 //		System.out.println();
 	}
+	/**
+	 * 返回夜间信息
+	 * */
+	synchronized public static List<String> getNightInfoByPlayerId(int roomId,int id){
+		List<String> badGuys = new ArrayList<String>();
+		if(!isRoomExist(roomId))return badGuys;
+		String[] iden = roomMap.get(roomId).identities;
+		if(id>=iden.length||id<0)return badGuys;
+		if(iden[id].equals("良民"))return badGuys;
+		for(int i=0;i<iden.length;i++){
+			if(!iden[i].equals("指挥官")&&!iden[i].equals("良民")){
+				badGuys.add("玩家"+i);
+			}
+		}
+		return badGuys;		
+	}	
 	private static Random random;
 	private static Map<Integer,RoomInfo> roomMap;//roomId-roomInfo
 	public static final String ROOM_ID = "room_id";

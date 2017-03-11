@@ -42,7 +42,7 @@ function colorClass(id){
 	else return 'grey';
 }
 function showIdentity(){
-	document.getElementById("infobar").innerHTML = '您的身份是:<b>'+iden+'</b>';
+	document.getElementById("infobar").innerHTML = '您的身份是:<b>'+iden+'</b> 抵抗者是:<b>'+nightInfo+'</b>';
 	setTimeout(function(){document.getElementById("infobar").innerHTML = '抵抗组织';},1000);	
 }
 function shuffleIdentity(){
@@ -75,6 +75,7 @@ function fetchVoteNum(){
 			}
 			iden = s[3];//身份
 			var colors = s[4].split(":");//颜色
+			nightInfo = s[5];
 			for(i=0;i<colors.length;i++){
 				document.getElementById("task"+i).style="background-color:"+colorClass(colors[i]);
 			}
@@ -86,6 +87,7 @@ function fetchVoteNum(){
 }
 fetchVoteNum();
 var iden='未知';//身份
+var nightInfo = '未知';//夜间信息
 </script>
 <style type="text/css">
 html,body{
